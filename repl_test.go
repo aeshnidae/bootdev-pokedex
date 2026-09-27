@@ -29,6 +29,10 @@ func TestCleanInput(t *testing.T) {
 			input:    "HELLO_WORLD",
 			expected: []string{"hello_world"},
 		},
+		{
+			input:    "   ",
+			expected: []string{},
+		},
 	}
 
 	for i, c := range cases {
@@ -43,6 +47,7 @@ func TestCleanInput(t *testing.T) {
 				t.Errorf("Test %d failed - %v != %v", i+1, word, expectedWord)
 			}
 		}
+		t.Logf("Test %d passed - '%v' == '%v'", i+1, c.input, c.expected)
 	}
 
 }
