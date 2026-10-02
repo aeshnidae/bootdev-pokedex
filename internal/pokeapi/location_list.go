@@ -2,8 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
 )
 
 func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
@@ -12,31 +10,13 @@ func (c *Client) ListLocations(pageURL *string) (RespShallowLocations, error) {
 		url = *pageURL
 	}
 
-	var dat []byte
-	if cached, ok := c.cache.Get(url); ok {
-		dat = cached
-	} else {
-		req, err := http.NewRequest("GET", url, nil)
-		if err != nil {
-			return RespShallowLocations{}, err
-		}
-
-		resp, err := c.httpClient.Do(req)
-		if err != nil {
-			return RespShallowLocations{}, err
-		}
-		defer resp.Body.Close()
-
-		data, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return RespShallowLocations{}, err
-		}
-		dat = data
-		c.cache.Add(url, dat)
+	dat, err := c.get(url)
+	if err != nil {
+		return RespShallowLocations{}, err
 	}
 
 	locationsResp := RespShallowLocations{}
-	err := json.Unmarshal(dat, &locationsResp)
+	err = json.Unmarshal(*dat, &locationsResp)
 	if err != nil {
 		return RespShallowLocations{}, err
 	}
